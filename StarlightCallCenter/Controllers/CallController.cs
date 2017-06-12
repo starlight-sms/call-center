@@ -33,7 +33,7 @@ namespace StarlightCallCenter.Controllers
                 Accept = "audio/*", 
                 BotName = "StarlightCallCenter", 
                 BotAlias = "Prod", 
-                ContentType = "audio/l16; rate=16000; channels=1", 
+                ContentType = "audio/l16; rate=8000; channels=1", 
                 UserId = "ZhouJie", 
             });
             var filename = "/Record/" + GetNewRandomFileName();

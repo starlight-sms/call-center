@@ -41,7 +41,6 @@ namespace StarlightCallCenter.Controllers
             {
                 response.AudioStream.CopyTo(file);
             }
-            await Task.Delay(1000);
             ViewBag.FileName = filename;
             return View();
         }

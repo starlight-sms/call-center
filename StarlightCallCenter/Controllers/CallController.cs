@@ -41,6 +41,7 @@ namespace StarlightCallCenter.Controllers
             {
                 response.AudioStream.CopyTo(file);
             }
+            await Task.Delay(1000);
             ViewBag.FileName = filename;
             return View();
         }
@@ -54,7 +55,7 @@ namespace StarlightCallCenter.Controllers
                 .Replace("=", "")
                 .Replace("+", "_")
                 .Replace("/", "-")
-                + ".wav";
+                + ".mp3";
         }
 
         private static async Task<Stream> DownloadUrl(string url)

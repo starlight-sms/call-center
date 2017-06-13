@@ -9,6 +9,7 @@ using System.IO;
 using Amazon.Lex;
 using Amazon;
 using Amazon.Lex.Model;
+using Newtonsoft.Json.Linq;
 
 namespace StarlightCallCenter.Controllers
 {
@@ -29,20 +30,51 @@ namespace StarlightCallCenter.Controllers
         {
             var response = await lexClient.PostContentAsync(new PostContentRequest
             {
-                InputStream = await DownloadUrl(recordingUrl), 
+                InputStream = FFmpegServer.ChangeWavRate(await DownloadUrl(recordingUrl)), 
                 Accept = "audio/*", 
                 BotName = "StarlightCallCenter", 
                 BotAlias = "Prod", 
                 ContentType = "audio/l16; rate=16000; channels=1", 
                 UserId = "ZhouJie", 
             });
-            var filename = "/Record/" + GetNewRandomFileName();
-            using (var file = System.IO.File.Create("wwwroot" + filename))
+
+            if (response.DialogState == DialogState.ReadyForFulfillment)
             {
-                response.AudioStream.CopyTo(file);
+                var obs = JObject.Parse(response.Slots);
+                var personName = obs["PersonName"].ToString().ToLowerInvariant();
+
+                string phone = null;
+                switch (personName)
+                {
+                    case "zhou jie":
+                        phone = "+****";
+                        break;
+                    case "wang jie":
+                        phone = "+****";
+                        break;
+                }
+
+                if (phone == null)
+                {
+                    ViewBag.PersonName = personName;
+                    return View("NoPhone");
+                }
+                else
+                {
+                    ViewBag.Phone = phone;
+                    return View("Call");
+                }
             }
-            ViewBag.FileName = filename;
-            return View();
+            else
+            {
+                var filename = "/Record/" + GetNewRandomFileName();
+                using (var file = System.IO.File.Create("wwwroot" + filename))
+                {
+                    response.AudioStream.CopyTo(file);
+                }
+                ViewBag.FileName = filename;
+                return View();
+            }
         }
 
         public static HttpClient hc = new HttpClient();
